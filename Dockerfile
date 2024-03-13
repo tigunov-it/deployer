@@ -12,13 +12,14 @@ ENV PATH $HELM_HOME:$YC_HOME/bin:$PATH
 
 RUN apk --no-cache add \
         curl \
-        python \
+        python3 \
         py-crcmod \
         bash \
         libc6-compat \
         openssh-client \
         git \
-        gnupg
+        gnupg \
+        aws-cli
 
 RUN curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
@@ -34,11 +35,6 @@ RUN curl -O https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
 
 RUN curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | \
     bash -s -- -i ${YC_HOME} -n
-
-RUN apk add --no-cache python3 py3-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install awscli \
-    && rm -rf /var/cache/apk/*
 
 RUN curl -L -o /usr/local/bin/kubedog https://tuf.kubedog.werf.io/targets/releases/${KUBEDOG_VERSION}/linux-amd64/bin/kubedog && \
     chmod +x /usr/local/bin/kubedog
