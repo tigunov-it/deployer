@@ -1,5 +1,6 @@
 FROM alpine:3.19
 
+ARG KUBECTL_VERSION=1.29.0
 ARG HELM_VERSION=3.14.2
 ARG KUBEDOG_VERSION=v0.4.0
 
@@ -19,12 +20,11 @@ RUN apk --no-cache add \
         openssh-client \
         git \
         gnupg \
-        aws-cli
+        unzip
 
-RUN curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+RUN curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/2024-01-04/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
-
 
 RUN curl -O https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
     tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
@@ -38,5 +38,10 @@ RUN curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | \
 
 RUN curl -L -o /usr/local/bin/kubedog https://tuf.kubedog.werf.io/targets/releases/${KUBEDOG_VERSION}/linux-amd64/bin/kubedog && \
     chmod +x /usr/local/bin/kubedog
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf aws
 
 VOLUME ["/root/.config"]
